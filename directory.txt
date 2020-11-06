@@ -1,0 +1,3 @@
+name:A, surname:B, phone:1232342345, city:Ekaterinburg, email:a@b.c
+name:Asd, surname:F, phone:89920456424, city:Moskow, email:asd@mail.ru
+name:A, surname:Dfg, phone:89935513453, city:Pupkino, email:baka@mail.cam

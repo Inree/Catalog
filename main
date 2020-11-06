@@ -1,0 +1,75 @@
+from Entry import Entry
+from EntriesFinder import EntriesFinder
+
+
+def addEntry():
+    entry = Entry()
+    entries.append(entry)
+    fields_names = ['name', 'surname', 'email', 'phone', 'city']
+    for field_name in fields_names:
+        print(field_name + ':', end=' ')
+        inp = input()
+        while not entry.trySetValue(field_name, inp) \
+                or field_name == 'email' and EntriesFinder.findEntryByEmail(entries, inp):
+            if not entry.trySetValue(field_name, inp):
+                print('invalid format.')
+            else:
+                print('this email already exist.')
+            print(field_name + ':', end=' ')
+            inp = input()
+    print("Entry added", '(' + entry.to_string() + ')')
+    file.write(entry.to_string() + '\n')
+
+
+def parseEntries(lines):
+    for line in lines:
+        entry = Entry()
+        entry.parse(line)
+        yield entry
+
+
+file = open("directory.txt", 'r+')
+entries = list(parseEntries(file.readlines()))
+activeEntry = None
+inp = input()
+while inp != 'exit':
+    if inp == 'add':
+        addEntry()
+    elif inp == 'find':
+        print('Key word:', end=' ')
+        foundEntries = list(EntriesFinder.findEntries(entries, input()))
+        if len(foundEntries) == 0:
+            print('No entries found.')
+        else:
+            print(f'Found entries:')
+            for i in foundEntries:
+                print(i.to_string())
+    elif inp == 'edit':
+        if activeEntry is None:
+            print("There's no active entry. Open one.")
+        else:
+            print('Type "field:value" to change or "done" if you ended edit.')
+            inp = input()
+            while inp != 'done':
+                inp = inp.split(':')
+                if len(inp) < 2 or not activeEntry.trySetValue(inp[0], inp[1]):
+                    print('invalid format')
+                else:
+                    print('active entry', inp[0], 'is now', inp[1])
+                inp = input()
+    elif inp == 'open':
+        print('Email:', end=' ')
+        activeEntry = EntriesFinder.findEntryByEmail(entries, input())
+        if activeEntry is None:
+            print('Invalid Email.')
+        else:
+            print('Active entry email is:', activeEntry.email)
+    elif inp == 'close':
+        activeEntry = None
+        print('You are not editing any entry now.')
+    elif inp == 'save':
+        file.close()
+        file = open("directory.txt", 'r+')
+    else:
+        print('Unknown command')
+    inp = input()
